@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check New Version
+        run: |
+          base_url='https://github.com/listen1/listen1_chrome_extension'
+          latest="$(curl -sL ${base_url}/releases/latest |grep -o '/tag/[a-zA-Z0-9\._-]\+' |head -1 |cut -d\/ -f3)"
+          if ! git tag -l |grep "$latest"; then
+              wget -O listen1.zip ${base_url}/archive/refs/tags/$latest.zip
+              unzip listen1.zip
+              cd listen1_chrome_extension*
+              mv -f manifest_firefox.json manifest.json
+              sed -i "s#githublisten1@gmail.com#${{ github.actor }}_listen1@github.com#" manifest.json
+              zip -r ../listen1.xpi *
+              rm -rf ../listen1.zip ../listen1_chrome_extension*
+              echo "NewTag=$latest" >> $GITHUB_ENV
+          fi
+      - name: "web-ext sign"
+        id: web-ext-sign
+        if: ${{ env.NewTag }}
+        uses: kewisch/action-web-ext@v1
+        with:
+          cmd: sign
+          source: listen1.xpi
+          channel: unlisted
+          apiKey: ${{ secrets.AMO_SIGN_KEY }}
+          apiSecret: ${{ secrets.AMO_SIGN_SECRET }}
+          timeout: 900000
+      - name: Upload To Artifact
+        if: ${{ env.NewTag }}
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ steps.web-ext-sign.outputs.target }}
+      - name: Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        if: ${{ env.NewTag }}
+        with:
+          name: ${{ env.NewTag }}
+          tag_name: ${{ env.NewTag }}
+          files: ${{ steps.web-ext-sign.outputs.target }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push to master
+        if: ${{ env.NewTag }}
+        run: |
+          rm -f listen1.xpi ${{ steps.web-ext-sign.outputs.target }}
+          sed -i '/url =/d' ./.git/config
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url --add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git pull --rebase
+          git add --all
+          git commit -m "${{ env.NewTag }}"
+          git push -u -f origin master
