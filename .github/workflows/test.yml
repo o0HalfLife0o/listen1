@@ -11,11 +11,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Check New Version
         run: |
           base_url='https://github.com/listen1/listen1_chrome_extension'
           latest="$(curl -sL ${base_url}/releases/latest |grep -o '/tag/[a-zA-Z0-9\._-]\+' |head -1 |cut -d\/ -f3)"
-          if ! git tag -l |grep -q "$latest"; then
+          if ! git tag -l |grep -q "${latest:1}"; then
               wget -O listen1.zip ${base_url}/archive/refs/tags/$latest.zip
               unzip listen1.zip
               mkdir -p web-ext-artifacts/
