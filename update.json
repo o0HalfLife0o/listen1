@@ -1,10 +1,10 @@
 {
   "addons": {
-    "{abcd1234-1abc-1234-12ab-abcdef123456}": {
+     "o0HalfLife0o_listen1@github": {
       "updates": [
         {
-          "version": "0.1",
-          "update_link": "https://example.com/addon-0.1.xpi"
+          "version": "2.27.0",
+          "update_link": "https://github.com/o0HalfLife0o/listen1/releases/download/2.27.0/listen1.xpi"
         }
       ]
     }
