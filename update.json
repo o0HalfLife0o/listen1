@@ -1,10 +1,10 @@
 {
   "addons": {
-     "o0HalfLife0o_listen1@github": {
+     "pvqogw_listen1@github": {
       "updates": [
         {
-          "version": "2.27.0",
-          "update_link": "https://github.com/o0HalfLife0o/listen1/releases/download/2.27.0/listen1.xpi"
+          "version": "2.28.0",
+          "update_link": "https://github.com/pvqogw/listen1/releases/download/2.28.0/listen1.xpi"
         }
       ]
     }
