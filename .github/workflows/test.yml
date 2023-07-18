@@ -24,7 +24,7 @@ jobs:
               cd listen1_chrome_extension*
               mv -f manifest_firefox.json manifest.json
               sed -i "/githublisten1@gmail.com/i\       \"update_url\": \"https:\/\/raw.githubusercontent.com\/${{ github.repository }}\/master\/update.json\"," manifest.json
-              sed -i "s#githublisten1@gmail.com#${{ github.actor }}_listen1@github#" manifest.json
+              sed -i "s#githublisten1@gmail.com#o0HalfLife0o_listen1@github#" manifest.json
               zip -r ../listen1.xpi *
               rm -rf ../listen1.zip ../listen1_chrome_extension*
               echo "NewTag=${latest:1}" >> $GITHUB_ENV
@@ -68,7 +68,7 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-url --add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
           git pull --rebase
-          sed -i "3c\     \"${{ github.actor }}_listen1@github\": {" update.json
+          sed -i "3c\     \"o0HalfLife0o_listen1@github\": {" update.json
           sed -i "/version/s#[a-zA-Z0-9\._-]\+\",#${{ env.NewTag }}\",#" update.json
           sed -i "/update_link/s#http.*#https:\/\/github.com\/${{ github.repository }}\/releases\/download\/${{ env.NewTag }}\/listen1.xpi\"#" update.json
           git add --all
